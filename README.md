@@ -54,6 +54,7 @@ fs.readFile('./txt/start.txt', 'utf8', (err, data1) => {
 SERVER
 ------
  función llamada replaceTemplate que toma dos argumentos: temp y product. Parece que esta función se encarga de reemplazar ciertas etiquetas dentro de un "template" con los valores correspondientes del objeto product.
+ luego este código carga plantillas HTML y datos JSON desde archivos, y luego crea un servidor HTTP básico utilizando Node.js. Las plantillas HTML (almacenadas en `temProduct`, `temCard` y `temOverview`) se llenan con el contenido de los archivos de plantillas en formato de texto. Los datos se extraen del archivo `data.json`, se convierten en un objeto JSON y se almacenan en `dataObj`. Posteriormente, se establece la base del servidor HTTP utilizando `http.createServer()`, aunque la lógica específica para manejar las solicitudes y generar respuestas aún no se ha implementado en este punto.
 
 ```javascript
 const replaceTemplate = (temp,product) =>{
@@ -68,6 +69,15 @@ const replaceTemplate = (temp,product) =>{
 
     if(!product.organic)output = output.replace(/{%IMAGE%}/g,product.image)
 }
+  conts temProduct = fs.readFileSync(`${__dirname}/templates/template-overview.html`,`utf-8`)
+  conts temCard = fs.readFileSync(`${__dirname}/templates/template-card.html`,`utf-8`)
+  conts temOverview = fs.readFileSync(`${__dirname}/templates/template-product.html`,`utf-8`)
+
+  const data = fs .readFileSync(`${__dirname}/dev-data/data.json`,`utf-8`);
+  const dataObj = JSON.parse(data);
+  const server = http.createServer((req, res)=>{
+    const {query,pathName} = url.parse(req.url,true);
+  })
 ```
 
 Dirname  
@@ -98,6 +108,7 @@ const dataObj = JSON.parse(data);
 ```
 Overview page 
 -
+Este código es parte de un servidor web. Si la ruta de la solicitud es la raíz ('/') o '/overview', el servidor responde con contenido HTML dinámico. Utiliza datos de un objeto llamado dataObj para generar tarjetas de productos en HTML. Luego, inserta estas tarjetas en una plantilla de resumen y envía la página resultante como respuesta al cliente que realizó la solicitud
 
 ```javascript
 
@@ -114,14 +125,22 @@ if(pathName === '/' || pathName === '/overview'){
 Product page
 -
 
+En este bloque de código, cuando la ruta de solicitud es '/product', el servidor responde generando una página HTML que muestra los detalles de un producto específico. Comienza configurando la cabecera del tipo de contenido como 'text/html', luego extrae los detalles del producto desde dataObj usando un parámetro de consulta id. A continuación, crea contenido HTML utilizando la plantilla temProduct y los datos del producto. Finalmente, envía esta página HTML como respuesta al cliente.
+
 
 ```javascript
 }else if (pathName === '/product'){
-    res.end('This in the PRODUCT ')
+  res.writeHead(200,{'Content-type':'text/html'});
+  const product = dataObj[query.id];
+  const output = replaceTemplate{temProduct, product};
+  res.end(output)
 }
 ```
 API
 -
+En esta porción adicional del código, si la ruta de la solicitud es `'/api'`, el servidor responde configurando una cabecera HTTP con un tipo de contenido de `application/json`. Luego, envía una respuesta que contiene los datos (`data`) en formato JSON al cliente que realizó la solicitud.
+
+En resumen, esta parte del código maneja solicitudes a la ruta `'/api'`, respondiendo con los datos en formato JSON.
 
 ```javascript
 }else if (pathName === '/api'){
